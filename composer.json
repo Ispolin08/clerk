@@ -2,6 +2,7 @@
     "name": "ispolin08/clerk",
     "description": "The clerk is at your service",
     "keywords": ["notice", "telegram", "slack", "parser"],
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Stepan Gavrilenko",
