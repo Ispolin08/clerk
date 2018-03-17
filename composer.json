@@ -5,6 +5,6 @@
         "php": "^5.3.3 || ^7.0"
     },
     "psr-4": {
-        "Ispolin08\\Clerk\\": ""
+        "Ispolin08\\ClerkBundle\\": ""
     }
 }
