@@ -100,14 +100,17 @@ class ClerkService {
 
 
         // Get data from previs check
-        $prevCheckData = $this->cache->getItem($checkId);
+        $cacheItem = $this->cache->getItem($checkId);
 
-        if (!$prevCheckData->isHit()) {
-            $prevCheckData->set($params);
-            $this->cache->save($prevCheckData);
+
+        if (!$cacheItem->isHit()) {
+            $prevCheckData = $params;
+        } else {
+            $prevCheckData = $cacheItem->get();
         }
 
-        $prevCheckData = $prevCheckData->get();
+        $cacheItem->set($params);
+        $this->cache->save($cacheItem);
 
         $params['prevCheck'] = $prevCheckData;
 
@@ -135,6 +138,7 @@ class ClerkService {
 //            if ($this->env == 'dev') {
 //                $check['handlers'] = [];
 //            }
+
 
             // my test
             $check['handlers'][] = [
