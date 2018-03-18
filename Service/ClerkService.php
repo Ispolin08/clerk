@@ -122,7 +122,10 @@ class ClerkService {
         if (!empty($message)) {
             // Send message to channel
 
+            echo $message;
+
             if (isset($this->channels[$checkId])) {
+                echo "send";
                 $this->channels[$checkId]->debug($message);
             }
         }
@@ -138,16 +141,6 @@ class ClerkService {
 //            if ($this->env == 'dev') {
 //                $check['handlers'] = [];
 //            }
-
-
-            // my test
-            $check['handlers'][] = [
-                'type'=>'telegram',
-                'options' => [
-                    'hash' => '569191535:AAE0zEME__2XCqq6DxoHHBMbIjmhTxgLVic',
-                    'chat' => '226628487'
-                ]
-            ];
 
 
             if (!isset($check['handlers'])) {
