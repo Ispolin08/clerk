@@ -4,7 +4,9 @@
     "require": {
         "php": "^5.3.3 || ^7.0"
     },
-    "psr-4": {
-        "Ispolin08\\ClerkBundle\\": ""
-    }
+    "autoload": {
+        "psr-4": { "Ispolin08\\ClerkBundle\\": "" }
+        
+    },
+    
 }
