@@ -2,7 +2,7 @@
 
 namespace Ispolin08\ClerkBundle\DataSource;
 
-class UrlDataSource implements DataSourceInterface{
+class UrlDataSource implements DataSourceInterface {
 
     public function getData($options){
 

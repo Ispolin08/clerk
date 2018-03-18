@@ -1,10 +1,9 @@
 <?php
 
-namespace Ispolin08\ClerkBundle\DataSource;
+namespace Ispolin08\ClerkBundle\DataTransformer;
 
-interface DataSourceInterface {
+interface DataTransformerInterface {
 
-    public function getData($options);
-
+    public function transform($html);
 
 }

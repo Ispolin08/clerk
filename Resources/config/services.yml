@@ -1,0 +1,19 @@
+services:
+    Ispolin08\ClerkBundle\DataSource\:
+        resource: '../../DataSource/*'
+        public: true
+        tags:
+           - { name: ispolin08.clerk.data_source}
+
+    Ispolin08\ClerkBundle\Command\DaemonCommand:
+        public: true
+        tags:
+           -  { name: console.command }
+
+    Ispolin08\ClerkBundle\Service\ClerkService:
+        public: true
+        arguments:
+          - "%checks%"
+          - !tagged ispolin08.clerk.data_source
+          - !tagged ispolin08.clerk.data_transformer
+          - "@twig"
