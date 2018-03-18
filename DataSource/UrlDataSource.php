@@ -1,6 +1,6 @@
 <?php
 
-namespace Ispolin08\DataSource;
+namespace Ispolin08\ClerkBundle\DataSource;
 
 class UrlDataSource implements DataSourceInterface{
 
