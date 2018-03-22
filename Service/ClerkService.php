@@ -131,12 +131,12 @@ class ClerkService
         if (!empty($message)) {
             // Send message to channel
 
-            echo $message;
+            echo rand(0,100).$message;
 
             if (isset($this->channels[$checkId])) {
                 echo "send";
                 $this->channels[$checkId]->debug($message);
-                var_dump(count($this->channels[$checkId]));
+                var_dump(count($this->channels[$checkId]->getHandlers()));
             }
         }
     }
