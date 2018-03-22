@@ -45,6 +45,20 @@ class DaemonCommand extends ContainerAwareCommand
     /** {@inheritdoc} */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+
+        $log = new \Monolog\Logger('telegram_channel');
+
+        $handler = new \Mero\Monolog\Handler\TelegramHandler(
+            '569191535:AAE0zEME__2XCqq6DxoHHBMbIjmhTxgLVic',
+            226628487,
+            \Monolog\Logger::DEBUG
+        );
+        $handler->setFormatter(new \Monolog\Formatter\LineFormatter());
+        $log->pushHandler($handler);
+
+        $log->debug('Message log');
+
+        sleep (2);
         foreach ($input->getArgument('checks') as $checkId) {
 
             $output->writeln($checkId);
