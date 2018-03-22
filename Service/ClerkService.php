@@ -66,6 +66,11 @@ class ClerkService
         // Init SourceClass
         $dataSourceClass = 'Ispolin08\ClerkBundle\DataSource\\'.ucfirst($name)."DataSource";
 
+        if (!isset($this->dataSources[$dataSourceClass])) {
+            $dataSourceClass = $name;
+
+        }
+
         return $this->dataSources[$dataSourceClass];
 
     }
@@ -180,6 +185,8 @@ class ClerkService
 
 
             }
+
+            var_dump(count($channel->getHandlers()). 'initialized');
             // TODO Configure it
             $streamHandler = new StreamHandler('./test.log');
             $channel->pushHandler($streamHandler);
