@@ -37,7 +37,7 @@ class ClerkService
      * ClerkService constructor.
      * @param $dataSources
      */
-    public function __construct($checks, iterable $dataSources, iterable $dataTransformers, \Twig_Environment $template)
+    public function __construct($checks,  $dataSources, $dataTransformers, \Twig_Environment $template)
     {
         foreach ($dataSources as $dataSource) {
             // TODO check Interface
