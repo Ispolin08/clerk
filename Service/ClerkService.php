@@ -13,7 +13,8 @@ use Ispolin08\ClerkBundle\DataSource\DataSourceInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Twig\Template;
 
-class ClerkService {
+class ClerkService
+{
 
 
     /** @var DataSourceInterface[] */
@@ -57,7 +58,8 @@ class ClerkService {
     }
 
 
-    private function getDataSource($name) {
+    private function getDataSource($name)
+    {
         // TODO Check if not exists in consturctor
 
         // Init SourceClass
@@ -67,7 +69,8 @@ class ClerkService {
 
     }
 
-    private function getDataTransformer($class){
+    private function getDataTransformer($class)
+    {
         // TODO Check if not exists in consturctor
         return $this->dataTransformers[$class];
     }
@@ -131,7 +134,8 @@ class ClerkService {
         }
     }
 
-    protected function initChannels(){
+    protected function initChannels()
+    {
 
         $handlers = [];
 
@@ -181,7 +185,8 @@ class ClerkService {
     }
 
     // move to abstract check class
-    private static function getChannelName($checkId){
+    private static function getChannelName($checkId)
+    {
         return 'check_'.$checkId;
     }
 
@@ -200,10 +205,6 @@ class ClerkService {
     {
         $this->checks = $checks;
     }
-
-
-
-
 
 
 }

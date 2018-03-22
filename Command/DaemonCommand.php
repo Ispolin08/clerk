@@ -22,10 +22,6 @@ class DaemonCommand extends ContainerAwareCommand
     /** @inheritdoc */
     protected function configure()
     {
-
-
-
-        
         $this
             ->setName('ispolin08:clerk:run')
             ->setDescription('Process checks')
