@@ -173,17 +173,16 @@ class ClerkService
                             break;
 
                     }
-                    $handlers[$key]->setFormatter(new \Monolog\Formatter\LineFormatter("%message%"));
+                    $handlers[$key]->setFormatter(new \Monolog\Formatter\LineFormatter("%message%", null, true));
 
                 }
                 $channel->pushHandler($handlers[$key]);
 
 
             }
+            // TODO Configure it
             $streamHandler = new StreamHandler('./test.log');
             $channel->pushHandler($streamHandler);
-
-            echo "stream ADDED";
 
             $this->channels[$checkId] = $channel;
         }
