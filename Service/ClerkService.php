@@ -131,7 +131,8 @@ class ClerkService
         if (!empty($message)) {
             // Send message to channel
 
-            echo rand(0,100).$message;
+            $message =rand(0,100).$message;
+            echo $message;
 
             if (isset($this->channels[$checkId])) {
                 echo "send";
