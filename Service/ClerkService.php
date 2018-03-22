@@ -136,6 +136,7 @@ class ClerkService
             if (isset($this->channels[$checkId])) {
                 echo "send";
                 $this->channels[$checkId]->debug($message);
+                var_dump(count($this->channels[$checkId]));
             }
         }
     }
@@ -186,7 +187,6 @@ class ClerkService
 
             }
 
-            var_dump(count($channel->getHandlers()). 'initialized');
             // TODO Configure it
             $streamHandler = new StreamHandler('./test.log');
             $channel->pushHandler($streamHandler);
