@@ -10,6 +10,7 @@
 namespace Ispolin08\ClerkBundle\Service;
 
 use Ispolin08\ClerkBundle\DataSource\DataSourceInterface;
+use Monolog\Handler\StreamHandler;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Twig\Template;
 
@@ -175,11 +176,15 @@ class ClerkService
                     $handlers[$key]->setFormatter(new \Monolog\Formatter\LineFormatter("%message%"));
 
                 }
-
                 $channel->pushHandler($handlers[$key]);
 
 
             }
+            $streamHandler = new StreamHandler('./test.log');
+            $channel->pushHandler($streamHandler);
+
+            echo "stream ADDED";
+
             $this->channels[$checkId] = $channel;
         }
     }
