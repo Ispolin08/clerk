@@ -8,6 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Serializer\Serializer;
 
 
 class DaemonCommand extends ContainerAwareCommand
@@ -22,7 +24,7 @@ class DaemonCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('ispolin08:clerk:run')
+            ->setName('ispolin08:clerk:process')
             ->setDescription('Process checks')
             ->addArgument(
                 'checks',
@@ -44,29 +46,21 @@ class DaemonCommand extends ContainerAwareCommand
     /** {@inheritdoc} */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $checks = $input->getArgument('checks');
+        $io = new SymfonyStyle($input, $output);
 
-        $log = new \Monolog\Logger('telegram_channel');
+        $io->title('Process checks');
 
-        $handler = new TelegramHandler(
-            '569191535:AAE0zEME__2XCqq6DxoHHBMbIjmhTxgLVic',
-            226628487,
-            \Monolog\Logger::DEBUG
-        );
-        $handler->setFormatter(new \Monolog\Formatter\LineFormatter());
-        $log->pushHandler($handler);
+        $io->progressStart(count($checks));
 
+        foreach ($checks as $checkId) {
 
-        $log->debug('Message log');
+            $this->clerkService->process($checkId);
 
-        die();
-        sleep (2);
-        foreach ($input->getArgument('checks') as $checkId) {
-
-            $output->writeln($checkId);
-
-            $this->clerkService->check($checkId);
-
-            sleep(1);
+            $io->progressAdvance();
         }
+
+        $io->success('Finish');
+
     }
 }

@@ -9,7 +9,9 @@
 
 namespace Ispolin08\ClerkBundle\Service;
 
+use Ispolin08\ClerkBundle\CheckProvider\CheckProviderInterface;
 use Ispolin08\ClerkBundle\DataSource\DataSourceInterface;
+use Ispolin08\ClerkBundle\Model\Check;
 use Monolog\Handler\StreamHandler;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Twig\Template;
@@ -18,10 +20,8 @@ class ClerkService
 {
 
 
-    /** @var DataSourceInterface[] */
-    private $dataSources = [];
-
-    private $dataTransformers = [];
+    /** @var  CheckProviderInterface */
+    protected $checkProvider;
 
     private $cache;
 
@@ -31,191 +31,92 @@ class ClerkService
     /** @var  LoggerInterface[] */
     private $channels;
 
+    /** @var  Check[] */
     private $checks;
 
     /**
      * ClerkService constructor.
      * @param $dataSources
      */
-    public function __construct($checks,  $dataSources, $dataTransformers, \Twig_Environment $template)
+    public function __construct(CheckProviderInterface $checkProvider, \Twig_Environment $template)
     {
-        foreach ($dataSources as $dataSource) {
-            // TODO check Interface
-            $this->dataSources[get_class($dataSource)] = $dataSource;
-        }
 
-        foreach ($dataTransformers as $dataTransformer) {
-//             TODO check Interface
-            $this->dataTransformers[get_class($dataTransformer)] = $dataTransformer;
-        }
+        // TODO CHECK IFACE
+        $this->checks = $checkProvider->provideChecks();
 
+
+        // TODO CONFIG IT
         $this->cache = new FilesystemAdapter();
         $this->template = $template;
 
-        $this->checks = $checks;
-
-//        $this->initChannels();
-
     }
 
-
-    private function getDataSource($name)
-    {
-        // TODO Check if not exists in consturctor
-
-        // Init SourceClass
-        $dataSourceClass = 'Ispolin08\ClerkBundle\DataSource\\'.ucfirst($name)."DataSource";
-
-        if (!isset($this->dataSources[$dataSourceClass])) {
-            $dataSourceClass = $name;
-
-        }
-
-        return $this->dataSources[$dataSourceClass];
-
-    }
-
-    private function getDataTransformer($class)
-    {
-        // TODO Check if not exists in consturctor
-        return $this->dataTransformers[$class];
-    }
-
-    public function check($checkId)
+    public function process($checkId)
     {
 
-        $params = [];
+        $templateParams = [];
 
         if (!isset($this->checks[$checkId])) {
-            return false;
+            throw new \Exception('Check '.$checkId.' not found');
         }
 
         $check = $this->checks[$checkId];
 
+        // Process all parameters
+        foreach ($check->getParameters() as $checkParameter) {
 
-        foreach ($check['data_sources'] as $dataSourceId => $dataSourceData) {
+            // Get Source
+            $data = $checkParameter->getDataSource()->getData($checkParameter->getDataSourceOptions());
 
-            $data = $this->getDataSource($dataSourceData['type'])->getData($dataSourceData['options']);
-
-            if (isset($dataSourceData['transformers'])) {
-
-                foreach ($dataSourceData['transformers'] as $transformerClass) {
-                    $data = $this->getDataTransformer($transformerClass)->transform($data);
-                }
+            // Transform
+            foreach ($checkParameter->getDataTransformers() as $dataTransformer) {
+                $data = $dataTransformer->transform($data);
             }
 
-            $params[$dataSourceId] = $data;
+            // Store for template
+            $templateParams[$checkParameter->getId()] = $data;
         }
-
 
         // Get data from previs check
-        $cacheItem = $this->cache->getItem($checkId);
+        $templateParams['lastTime'] = $this->getLastTimeData($check, $templateParams);
+
+        // TODO Check Existence of all sub keys;
 
 
-        if (!$cacheItem->isHit()) {
-            $prevCheckData = $params;
-        } else {
-            $prevCheckData = $cacheItem->get();
-        }
-
-        $cacheItem->set($params);
-        $this->cache->save($cacheItem);
-
-        $params['prevCheck'] = $prevCheckData;
-
-
-        $message = $this->template->render('Checker/'.$checkId.'.html.twig', $params);
+        // TODO Configure it
+        $message = $this->template->render('Checker/'.$checkId.'.html.twig', $templateParams);
 
         $message = trim($message);
 
         if (!empty($message)) {
             // Send message to channel
 
-            $message =rand(0,100).$message;
-            echo $message;
+            // Debug
+//            $message =rand(0,100).$message;
+//            echo $message;
 
-            if (isset($this->channels[$checkId])) {
-                echo "send";
-                $this->channels[$checkId]->debug($message);
-                var_dump(count($this->channels[$checkId]->getHandlers()));
-            }
+            // TODO Dispatch event?
+            // TODO LOGGER
+            echo "send";
+
+            $check->getChannel()->info($message);
         }
     }
 
-    protected function initChannels()
+    protected function getLastTimeData(Check $check, $params)
     {
+        $cacheItem = $this->cache->getItem($check->getId());
 
-        $handlers = [];
-
-        foreach ($this->checks as $checkId => $check) {
-            $channel = new \Monolog\Logger(self::getChannelName($checkId));
-
-//            if ($this->env == 'dev') {
-//                $check['handlers'] = [];
-//            }
-
-
-            if (!isset($check['handlers'])) {
-                continue;
-            }
-
-            foreach ($check['handlers'] as $handler) {
-
-                $key = $handler['type'].'_'.implode(',', $handler['options']);
-
-                if (!isset($handlers[$key])) {
-
-                    switch ($handler['type']) {
-                        case 'telegram':
-                            $handlers[$key] = new \Mero\Monolog\Handler\TelegramHandler(
-                                $handler['options']['hash'],
-                                $handler['options']['chat'],
-                                \Monolog\Logger::DEBUG
-                            );
-                            break;
-                        case 'slack':
-                            break;
-
-                        case 'email':
-                            break;
-
-                    }
-                    $handlers[$key]->setFormatter(new \Monolog\Formatter\LineFormatter("%message%", null, true));
-
-                }
-                $channel->pushHandler($handlers[$key]);
-
-
-            }
-
-            // TODO Configure it
-            $streamHandler = new StreamHandler('./test.log');
-            $channel->pushHandler($streamHandler);
-
-            $this->channels[$checkId] = $channel;
+        if (!$cacheItem->isHit()) {
+            $lastTimeData = $params;
+        } else {
+            $lastTimeData = $cacheItem->get();
         }
-    }
 
-    // move to abstract check class
-    private static function getChannelName($checkId)
-    {
-        return 'check_'.$checkId;
-    }
+        $cacheItem->set($params);
+        $this->cache->save($cacheItem);
 
-    /**
-     * @return mixed
-     */
-    public function getChecks()
-    {
-        return $this->checks;
-    }
-
-    /**
-     * @param mixed $checks
-     */
-    public function setChecks($checks)
-    {
-        $this->checks = $checks;
+        return $lastTimeData;
     }
 
 

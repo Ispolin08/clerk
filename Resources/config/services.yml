@@ -13,7 +13,13 @@ services:
     Ispolin08\ClerkBundle\Service\ClerkService:
         public: true
         arguments:
-          - "%checks%"
-          - !tagged ispolin08.clerk.data_source
-          - !tagged ispolin08.clerk.data_transformer
+          - '@Ispolin08\ClerkBundle\CheckProvider\ArrayCheckProvider'
           - "@twig"
+
+    Ispolin08\ClerkBundle\CheckProvider\ArrayCheckProvider:
+        public: true
+        arguments:
+            - "%checks%"
+            - 'Ispolin08\ClerkBundle\Model\Check'
+            - !tagged ispolin08.clerk.data_source
+            - !tagged ispolin08.clerk.data_transformer
