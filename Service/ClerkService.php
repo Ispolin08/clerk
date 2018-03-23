@@ -54,7 +54,7 @@ class ClerkService
 
         $this->checks = $checks;
 
-        $this->initChannels();
+//        $this->initChannels();
 
     }
 
