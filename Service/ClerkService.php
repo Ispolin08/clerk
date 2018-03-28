@@ -91,13 +91,8 @@ class ClerkService
         if (!empty($message)) {
             // Send message to channel
 
-            // Debug
-//            $message =rand(0,100).$message;
-//            echo $message;
-
             // TODO Dispatch event?
             // TODO LOGGER
-            echo "send";
 
             $check->getChannel()->info($message);
         }
